@@ -24,6 +24,16 @@ func CreateStudent(c *gin.Context) {
 }
 
 // GET /student/:id
+// func GetStudent(c *gin.Context) {
+// 	var student entity.Student
+// 	id := c.Param("id")
+// 	if tx := entity.DB().Where("STUDENT_NUMBER = ?", id).First(&student); tx.RowsAffected == 0 {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "student not found"})
+// 		return
+// 	}
+
+//		c.JSON(http.StatusOK, gin.H{"data": student})
+//	}
 func GetStudent(c *gin.Context) {
 	var student entity.Student
 	id := c.Param("id")

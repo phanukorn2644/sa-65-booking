@@ -16,6 +16,8 @@ async function Login(data: SigninInterface) {
     .then((response) => response.json())
     .then((res) => {
       if (res.data) {
+        console.log(res.data)
+        localStorage.setItem("student_number", res.data.student_number);
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("uid", res.data.id);
         return res.data;
@@ -137,7 +139,7 @@ async function GetTimes() {
   return res;
 }
 
-async function GetPlaylistByUID() {
+async function GetStudentByUID() {
   let uid = localStorage.getItem("uid");
   const requestOptions = {
     method: "GET",
@@ -148,7 +150,7 @@ async function GetPlaylistByUID() {
   };
 
   let res = await fetch(
-    `${apiUrl}/playlist/watched/user/${uid}`,
+    `${apiUrl}/Student/${uid}`,
     requestOptions
   )
     .then((response) => response.json())
@@ -212,7 +214,7 @@ export {
   GetRooms,
   GetBooking,
   GetTimes,
-  GetPlaylistByUID,
+  GetStudentByUID,
   CreateUser,
   BookingRooms,
   GetStudent

@@ -24,8 +24,9 @@ type SignUpPayload struct {
 
 // LoginResponse token response
 type LoginResponse struct {
-	Token string `json:"token"`
-	ID    uint   `json:"id"`
+	STUDENT_NUMBER string `json:"student_number"`
+	Token          string `json:"token"`
+	ID             uint   `json:"id"`
 }
 
 // POST /login
@@ -68,8 +69,9 @@ func Login(c *gin.Context) {
 	}
 
 	tokenResponse := LoginResponse{
-		Token: signedToken,
-		ID:    user.ID,
+		STUDENT_NUMBER: user.STUDENT_NUMBER,
+		Token:          signedToken,
+		ID:             user.ID,
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": tokenResponse})

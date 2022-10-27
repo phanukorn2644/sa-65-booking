@@ -20,11 +20,13 @@ import { RoomInterface } from "../interfaces/IRoom";
 import { TimeInterface } from "../interfaces/ITime";
 import { StudentInterface } from "../interfaces/IStudent";
 import { BookingInterface } from "../interfaces/IBooking";
+// import { SnumberInterface } from "../interfaces/ISnumber"
+import MenuItem from '@mui/material/MenuItem';
 
 import {
   GetRooms,
   GetBooking,
-  GetPlaylistByUID,
+  GetStudentByUID,
   GetTimes,
   BookingRooms,
   GetStudent,
@@ -37,9 +39,10 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 });
 
 function BookingCreate() {
+  // const [Snumber, setSnumber] = useState<SnumberInterface[]>([]);
   const [Rooms, setRooms] = useState<RoomInterface[]>([]);
   const [Times, setTimes] = useState<TimeInterface []>([]);
-  const [Students, setStudents] = useState<StudentInterface[]>([]);
+  const [Students, setStudents] = useState<StudentInterface>();
   const [BookingRoom, setBooking] = useState<BookingInterface>({
     Check_in_date: new Date(),
   });
@@ -81,18 +84,27 @@ function BookingCreate() {
   };
 
   const getStudent = async () => {
-    let res = await GetStudent();
+    let res = await  GetStudent();
     if (res) {
       setStudents(res);
     }
   };
 
+  const getStudentByUID = async () => {
+    let res = await GetStudentByUID();
+    if (res) {
+      setStudents(res);
+    }
+  };
+  
   useEffect(() => {
     getRooms();
     getTimes();
-    getStudent();
+    // getStudent();
+    getStudentByUID();
+    
   }, []);
-
+  
   const convertType = (data: string | number | undefined) => {
     let val = typeof data === "string" ? parseInt(data) : data;
     return val;
@@ -208,19 +220,19 @@ function BookingCreate() {
                 native
                 value={BookingRoom.STUDENT_ID + ""}
                 onChange={handleChange}
-                
+                // disabled
                 inputProps={{
                   name: "STUDENT_ID",
                 }}
               >
                 <option aria-label="None" value="">
                   กรุณาเลือกรหัสนักศึกษา
+                </option> 
+                <option value={Students?.ID} key={Students?.ID}>
+                  {Students?.STUDENT_NUMBER}
                 </option>
-                {Students.map((item: StudentInterface) => (
-                  <option value={item.ID} key={item.ID}>
-                    {item.STUDENT_NUMBER}
-                  </option>
-                ))}
+                
+             
               </Select>
             </FormControl>
              
