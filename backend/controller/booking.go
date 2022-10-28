@@ -17,30 +17,26 @@ func CreateBooking(c *gin.Context) {
 	var time entity.Time
 	var student entity.Student
 
-	// ผลลัพธ์ที่ได้จากขั้นตอนที่ 8 จะถูก bind เข้าตัวแปร watchVideo
 	if err := c.ShouldBindJSON(&booking); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// 9: ค้นหา video ด้วย id
 	if tx := entity.DB().Where("id = ?", booking.Room_id).First(&room); tx.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "video not found"})
 		return
 	}
 
-	// 10: ค้นหา resolution ด้วย id
 	if tx := entity.DB().Where("id = ?", booking.TimeID).First(&time); tx.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "resolution not found"})
 		return
 	}
 
-	// 11: ค้นหา playlist ด้วย id
 	if tx := entity.DB().Where("id = ?", booking.STUDENT_ID).First(&student); tx.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "playlist not found"})
 		return
 	}
-	// 12: สร้าง WatchVideo
+
 	bk := entity.Booking{
 		Room:          room,    // โยงความสัมพันธ์กับ Entity Room
 		Time:          time,    // โยงความสัมพันธ์กับ Entity Rime

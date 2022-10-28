@@ -14,7 +14,9 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { SigninInterface } from "../interfaces/ISignin";
-import { Login } from "../services/HttpClientService";
+import { Login } from "../services/HttpClientServiceEm";
+import { LoginStudent } from "../services/HttpClientServiceEm";
+
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -51,7 +53,8 @@ function SignIn() {
 
   const submit = async () => {
     let res = await Login(signin);
-    if (res) {
+    let resstd = await LoginStudent(signin);
+    if (res || resstd) {
       setSuccess(true);
       setTimeout(() => {
         window.location.reload();
@@ -60,6 +63,7 @@ function SignIn() {
       setError(true);
     }
   };
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -92,7 +96,7 @@ function SignIn() {
           sm={4}
           md={7}
           sx={{
-            backgroundImage: "url(https://lh3.googleusercontent.com/p/AF1QipOrVHrk6_S8BVQICWG0MH2VTK2bPul0kmGrY9B5=w1080-h608-p-no-v0)",
+            backgroundImage: "url(https://source.unsplash.com/random)",
             backgroundRepeat: "no-repeat",
             backgroundColor: (t) =>
               t.palette.mode === "light"
@@ -124,12 +128,12 @@ function SignIn() {
                 margin="normal"
                 required
                 fullWidth
-                id="Username"
-                label="Username"
-                name="username"
-                autoComplete="username"
+                id="User"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
                 autoFocus
-                value={signin.Username || ""}
+                value={signin.User || ""}
                 onChange={handleInputChange}
               />
               <TextField
@@ -163,6 +167,7 @@ function SignIn() {
       </Grid>
     </ThemeProvider>
   );
+
 }
 
 export default SignIn;

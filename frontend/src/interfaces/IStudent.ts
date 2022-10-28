@@ -1,6 +1,6 @@
 import { EmployeeInterface } from "../interfaces/IEmployee";
-import { GenderInterface } from "../interfaces/IGender";
-import { ProvinceInterface } from "../interfaces/IProvince";
+import { GendersInterface } from "../interfaces/IGender";
+import { ProvincesInterface } from "../interfaces/IProvince";
 import { ProgramInterface } from "../interfaces/IProgram";
 import { RoleInterface } from "../interfaces/IRole";
 
@@ -11,9 +11,9 @@ export interface StudentInterface {
   PERSONAL_ID? : string;
   Password?: string;
   GenderID?: number;
-  Gender?: GenderInterface;
+  Gender?: GendersInterface;
   ProvinceID?: number;
-  Province?: ProvinceInterface;
+  Province?: ProvincesInterface;
   ProgramID?: number;
   Program?: ProgramInterface;
   RoleID?: number;

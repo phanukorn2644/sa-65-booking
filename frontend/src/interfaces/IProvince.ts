@@ -1,5 +1,4 @@
-export interface ProvinceInterface {
+export interface ProvincesInterface{
     ID: number,
-    Name: string,
+	Name:  string,
 }
-  

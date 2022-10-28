@@ -8,72 +8,102 @@ import (
 	"net/http"
 )
 
-// POST /room
+// POST /Rooms
+
 func CreateRoom(c *gin.Context) {
+
 	var room entity.Room
+	var room_price entity.Room_price
+	var room_type entity.Room_type
+	var set_of_furniture entity.Set_of_furniture
+
 	if err := c.ShouldBindJSON(&room); err != nil {
+
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
 		return
+
 	}
 
-	if err := entity.DB().Create(&room).Error; err != nil {
+	if tx := entity.DB().Where("id = ?", room.Room_type_id).First(&room_type); tx.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "room type หาไม่เจอเวนนนน"})
+		return
+
+	}
+	if tx := entity.DB().Where("id = ?", room.Room_price_id).First(&room_price); tx.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "room price หาไม่เจอเวนนนน"})
+		return
+
+	}
+	if tx := entity.DB().Where("id = ?", room.Set_of_furniture_id).First(&set_of_furniture); tx.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "set of furniture หาไม่เจอเวนนนน"})
+
+		return
+
+	}
+	wv := entity.Room{
+		Room_type:        room_type,
+		Room_price:       room_price,
+		Set_of_furniture: set_of_furniture,
+	}
+	if err := entity.DB().Create(&wv).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"data": room})
+	c.JSON(http.StatusOK, gin.H{"data": wv})
 }
 
-// GET /room/:id
+// GET /Room/:id
+// GET /watchvideo/:id
 func GetRoom(c *gin.Context) {
-	var room entity.Room
+	var Room entity.Room
 	id := c.Param("id")
-	if tx := entity.DB().Where("id = ?", id).First(&room); tx.RowsAffected == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "room not found"})
+	if tx := entity.DB().Where("id = ?", id).First(&Room); tx.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Room not found"})
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{"data": room})
+	c.JSON(http.StatusOK, gin.H{"data": Room})
 }
 
-// GET /rooms
-func ListRooms(c *gin.Context) {
-	var rooms []entity.Room
-	if err := entity.DB().Raw("SELECT * FROM rooms").Scan(&rooms).Error; err != nil {
+// GET /watch_videos
+func ListRoom(c *gin.Context) {
+	var Room []entity.Room
+	if err := entity.DB().Preload("Room_type").Preload("Room_price").Preload("Set_of_furniture").Raw("SELECT * FROM Rooms").Find(&Room).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": rooms})
+	c.JSON(http.StatusOK, gin.H{"data": Room})
 }
 
-// DELETE /rooms/:id
+// DELETE /watch_videos/:id
 func DeleteRoom(c *gin.Context) {
 	id := c.Param("id")
-	if tx := entity.DB().Exec("DELETE FROM rooms WHERE id = ?", id); tx.RowsAffected == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "room not found"})
+	if tx := entity.DB().Exec("DELETE FROM Rooms WHERE id = ?", id); tx.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Room not found"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": id})
 }
 
-// PATCH /rooms
+// PATCH /watch_videos
 func UpdateRoom(c *gin.Context) {
-	var room entity.Room
-	if err := c.ShouldBindJSON(&room); err != nil {
+	var Room entity.Room
+	if err := c.ShouldBindJSON(&Room); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if tx := entity.DB().Where("id = ?", room.ID).First(&room); tx.RowsAffected == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "resolution not found"})
+	if tx := entity.DB().Where("id = ?", Room.ID).First(&Room); tx.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Room not found"})
 		return
 	}
 
-	if err := entity.DB().Save(&room).Error; err != nil {
+	if err := entity.DB().Save(&Room).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": room})
+	c.JSON(http.StatusOK, gin.H{"data": Room})
 }

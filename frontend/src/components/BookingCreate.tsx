@@ -92,6 +92,7 @@ function BookingCreate() {
 
   const getStudentByUID = async () => {
     let res = await GetStudentByUID();
+    console.log(res)
     if (res) {
       setStudents(res);
     }

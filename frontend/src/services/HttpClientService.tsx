@@ -2,6 +2,7 @@ import React from "react";
 import { SigninInterface } from "../interfaces/ISignin";
 import { UsersInterface } from "../interfaces/IUser";
 import { BookingInterface } from "../interfaces/IBooking";
+import { EmployeeInterface } from "../interfaces/IEmployee";
 
 const apiUrl = "http://localhost:8080";
 
@@ -12,7 +13,7 @@ async function Login(data: SigninInterface) {
     body: JSON.stringify(data),
   };
 
-  let res = await fetch(`${apiUrl}/login`, requestOptions)
+  let res = await fetch(`${apiUrl}/login_student`, requestOptions)
     .then((response) => response.json())
     .then((res) => {
       if (res.data) {
@@ -20,6 +21,10 @@ async function Login(data: SigninInterface) {
         localStorage.setItem("student_number", res.data.student_number);
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("uid", res.data.id);
+        // เก็บข้อมูล position ที่ login เข้ามา
+        localStorage.setItem("position", res.data.position);
+        // เก็บข้อมูล position ที่ login เข้ามา
+        localStorage.setItem("role", res.data.role);
         return res.data;
       } else {
         return false;
@@ -28,7 +33,33 @@ async function Login(data: SigninInterface) {
 
   return res;
 }
+async function LoginStudent(data: SigninInterface) {
+  const requestOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  };
 
+  let res = await fetch(`${apiUrl}/login_student`, requestOptions)
+    .then((response) => response.json())
+    .then((res) => {
+      if (res.data) {
+        console.log(res.data);
+        localStorage.setItem("student_number", res.data.student_number);
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("uid", res.data.id);
+        // เก็บข้อมูล position ที่ login เข้ามา
+        localStorage.setItem("position", res.data.position);
+        // เก็บข้อมูล position ที่ login เข้ามา
+        localStorage.setItem("role", res.data.role);
+        return res.data;
+      } else {
+        return false;
+      }
+    });
+
+  return res;
+}
 async function GetBooking() {
   const requestOptions = {
     method: "GET",
@@ -217,5 +248,6 @@ export {
   GetStudentByUID,
   CreateUser,
   BookingRooms,
-  GetStudent
+  GetStudent,
+  LoginStudent,
 };

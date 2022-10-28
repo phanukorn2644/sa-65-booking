@@ -1,39 +1,87 @@
 package controller
 
 import (
-	"github.com/phanukorn2644/sa-65-example/entity"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
-
-	"net/http"
+	"github.com/phanukorn2644/sa-65-example/entity"
+	"golang.org/x/crypto/bcrypt"
 )
 
-// POST /student
+// * POST /student
 func CreateStudent(c *gin.Context) {
-	var student entity.Student
-	if err := c.ShouldBindJSON(&student); err != nil {
+
+	var students entity.Student
+	var gender entity.Gender
+	var province entity.Province
+	var program entity.Program
+	var role entity.Role
+	// var employee entity.Employee
+
+	// ผลลัพธ์ที่ได้จากขั้นตอนที่ 9 จะถูก bind เข้าตัวแปร student
+	if err := c.ShouldBindJSON(&students); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := entity.DB().Create(&student).Error; err != nil {
+	// 10: ค้นหา gender ด้วย id
+	// if tx := entity.DB().Where("id = ?", students.EmployeeID).First(&employee); tx.RowsAffected == 0 { //error
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "gender not found"})
+	// 	return
+	// }
+	if tx := entity.DB().Where("id = ?", students.GenderID).First(&gender); tx.RowsAffected == 0 { //error
+		c.JSON(http.StatusBadRequest, gin.H{"error": "gender not found"})
+		return
+	}
+
+	// 11: ค้นหา province ด้วย id
+	if tx := entity.DB().Where("id = ?", students.ProvinceID).First(&province); tx.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "province not found"})
+		return
+	}
+
+	// 13: ค้นหา Program ด้วย id
+	if tx := entity.DB().Where("id = ?", students.ProgramID).First(&program); tx.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "program not found"})
+		return
+	}
+
+	// 13: ค้นหา Role ด้วย id
+	if tx := entity.DB().Where("id = ?", students.RoleID).First(&role); tx.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "role not found"})
+		return
+	}
+
+	// เข้ารหัสลับจากบัตรประชาชนที่ Admin กรอกข้อมูล
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(students.Password), 14)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error hashing password"})
+		return
+	}
+
+	students.Password = string(hashPassword)
+	// 14: สร้าง Student
+	std := entity.Student{
+		STUDENT_NAME:   students.STUDENT_NAME,
+		STUDENT_NUMBER: students.STUDENT_NUMBER,
+		PERSONAL_ID:    students.PERSONAL_ID,
+		Password:       students.Password,
+		Gender:         gender,   // โยงความสัมพันธ์กับ Entity Gender
+		Province:       province, // โยงความสัมพันธ์กับ Entity Province
+		Program:        program,  // โยงความสัมพันธ์กับ Entity Program
+		Role:           role,     // โยงความสัมพันธ์กับ Entity Role
+	}
+
+	// 15: บันทึก
+	if err := entity.DB().Create(&std).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"data": student})
+	c.JSON(http.StatusCreated, gin.H{"data": std})
+
 }
 
-// GET /student/:id
-// func GetStudent(c *gin.Context) {
-// 	var student entity.Student
-// 	id := c.Param("id")
-// 	if tx := entity.DB().Where("STUDENT_NUMBER = ?", id).First(&student); tx.RowsAffected == 0 {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "student not found"})
-// 		return
-// 	}
-
-//		c.JSON(http.StatusOK, gin.H{"data": student})
-//	}
+// GET /Student/:id
 func GetStudent(c *gin.Context) {
 	var student entity.Student
 	id := c.Param("id")
@@ -41,49 +89,20 @@ func GetStudent(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "student not found"})
 		return
 	}
-
 	c.JSON(http.StatusOK, gin.H{"data": student})
 }
 
-// GET /students
-func ListStudents(c *gin.Context) {
+// GET /student
+func ListStudent(c *gin.Context) {
+
 	var students []entity.Student
-	if err := entity.DB().Raw("SELECT * FROM students").Scan(&students).Error; err != nil {
+
+	if err := entity.DB().Preload("Gender").Preload("Province").Preload("Program").Preload("Role").Preload("Employee").Raw("SELECT * FROM students").Find(&students).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": students})
-}
 
-// DELETE /students/:id
-func DeleteStudent(c *gin.Context) {
-	id := c.Param("id")
-	if tx := entity.DB().Exec("DELETE FROM students WHERE id = ?", id); tx.RowsAffected == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "student not found"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"data": id})
-}
-
-// PATCH /students
-func UpdateStudent(c *gin.Context) {
-	var student entity.Student
-	if err := c.ShouldBindJSON(&student); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	if tx := entity.DB().Where("id = ?", student.ID).First(&student); tx.RowsAffected == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "resolution not found"})
-		return
-	}
-
-	if err := entity.DB().Save(&student).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"data": student})
 }

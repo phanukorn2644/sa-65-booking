@@ -24,7 +24,7 @@ type Time struct {
 
 type Gender struct {
 	gorm.Model
-	GENDER_NAME string
+	Name string
 	// 1 เพศต่อ 1 student
 	Students  []Student  `gorm:"foreignKey:GenderID"`
 	Employees []Employee `gorm:"foreignKey:GenderID"`
@@ -55,9 +55,9 @@ type Room_price struct {
 
 	Room []Room `gorm:"foreignKey:Room_price_id"`
 }
-type furniture struct {
+type Furniture struct {
 	gorm.Model
-	furniture_type string
+	Furniture_type string
 
 	Set_of_furniture_id *uint
 	Set_of_furniture    Set_of_furniture `gorm:"refernces:id"`
@@ -67,7 +67,7 @@ type Set_of_furniture struct {
 	gorm.Model
 	Set_of_furniture_title string
 
-	furniture []furniture `gorm:"foreignKey:Set_of_furniture_id"`
+	furniture []Furniture `gorm:"foreignKey:Set_of_furniture_id"`
 	Room      []Room      `gorm:"foreignKey:Set_of_furniture_id"`
 }
 
@@ -145,7 +145,7 @@ type Student struct {
 	gorm.Model
 	STUDENT_NUMBER string `gorm:"uniqueIndex"`
 	STUDENT_NAME   string
-	PERSONAL_ID    uint
+	PERSONAL_ID    string
 	Password       string
 	//
 	GenderID *uint
@@ -245,5 +245,5 @@ type Repair struct {
 	Room_id        *uint
 	Room           Room `gorm:"refernces:Room_id"`
 	Furniture_id   *uint
-	Furniture      furniture `gorm:"refernces:furniture_id"`
+	Furniture      Furniture `gorm:"refernces:furniture_id"`
 }

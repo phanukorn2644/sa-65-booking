@@ -21,15 +21,26 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleIcon from "@mui/icons-material/People";
 import YouTubeIcon from "@mui/icons-material/YouTube";
+import FolderIcon from '@mui/icons-material/Folder';
+import ConstructionIcon from '@mui/icons-material/Construction';
+import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded';
+
+
 
 import Home from "./components/Home"
-import Users from "./components/Users";
-import UserCreate from "./components/UserCreate";
-// import WatchVideos from "./components/WatchVideos";
-// import WatchVideoCreate from "./components/WatchVideoCreate";
 import SignIn from "./components/SignIn";
 import BookingCreate from "./components/BookingCreate";
 import Booking from "./components/Booking";
+import Employees from "./components/Employees";
+import EmployeeCreate from "./components/EmployeeCreate";
+import Room from "./components/Room";
+import RoomCreate from "./components/RoomCreate"
+import Repair from "./components/Repair";
+import RepairCreate from "./components/RepairCreate";
+import Students from "./components/Student";
+import StudentCreate from "./components/StudentCreate";
+import Payment_Bill from "./components/Payment_Bill";
+import Payment_Bill_Create from "./components/Payment_Bill_Create";
 
 const drawerWidth = 240;
 
@@ -85,21 +96,29 @@ const mdTheme = createTheme();
 
 const menu = [
   { name: "หน้าแรก", icon: <HomeIcon />, path: "/" },
-  { name: "จองห้องพัก", icon: <PeopleIcon />, path: "/Booking" },
-  // { name: "การเข้าชมวีดีโอ", icon: <YouTubeIcon />, path: "/watch_videos" },
+  { name: "จองห้องพัก", icon: <PeopleIcon />, path: "/Booking" , position: "Student"},
+  { name: "พนักงาน", icon: <PeopleIcon />, path: "/employees" , position: "Admin"},
+  { name: "บันทึกข้อมูลห้อง", icon: <FolderIcon />, path: "/Rooms" , position: "Admin"},
+  { name: "แจ้งซ่อม", icon: <ConstructionIcon />, path: "/Repair" , position: "Student"},
+  { name: "ลงทะเบียนนักศึกษา", icon: <PeopleIcon />, path: "/students" ,position: "Admin"},
+  { name: "ใบเสร็จชำระค่าใช้จ่าย", icon: <ReceiptLongRoundedIcon />, path: "/payment_bills",position: "Admin" },
 ];
 
 function App() {
   const [token, setToken] = useState<String>("");
   const [open, setOpen] = React.useState(true);
+  const [position, setPosition] = useState<String | null>("");
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const position = localStorage.getItem("position");
     if (token) {
       setToken(token);
+      
+      setPosition(position);
     }
   }, []);
 
@@ -164,7 +183,8 @@ function App() {
             </Toolbar>
             <Divider />
             <List>
-              {menu.map((item, index) => (
+              {menu.map((item, index) => 
+              position === item.position &&(
                 <Link
                   to={item.path}
                   key={item.name}
@@ -196,11 +216,17 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/Booking" element={<Booking />} />
                 <Route path="/Booking/create" element={<BookingCreate />} />
-                {/* <Route path="/watch_videos" element={<WatchVideos />} /> */}
-                {/* <Route
-                  path="/watch_video/create"
-                  element={<BookingCreate />}
-                /> */}
+                <Route path="/employees" element={<Employees />} />
+                <Route path="/employee/create" element={<EmployeeCreate />} />
+                <Route path="/Rooms" element={<Room />} />
+                <Route path="/Room/create" element={<RoomCreate/>}/>
+                <Route path="/Repair" element={<Repair />} />
+                <Route path="/Repair/create" element={<RepairCreate />} />
+                <Route path="/students" element={<Students />} />
+                <Route path="/student/create" element={<StudentCreate />} />
+                <Route path="/payment_bills" element={<Payment_Bill />}/>
+                <Route path="/payment_bills/create"element={<Payment_Bill_Create />}/>
+                
               </Routes>
             </Container>
           </Box>
