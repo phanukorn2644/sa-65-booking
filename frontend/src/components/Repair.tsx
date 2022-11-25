@@ -43,7 +43,7 @@ function Repair() {
       valueFormatter: (params) => params.value.Furniture_type,
     },
 
-    { field: "Repair_Comment", headerName: "Repair_Comment", width: 250},
+    { field: "Repair_Comment", headerName: "Repair_Commen", width: 250},
   ];
 
   return (
